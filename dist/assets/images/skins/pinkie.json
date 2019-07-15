@@ -1,0 +1,36 @@
+{"frames": [
+
+{
+	"filename": "pinkie1.png",
+	"frame": {"x":0,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+},
+{
+	"filename": "pinkie2.png",
+	"frame": {"x":178,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+},
+{
+	"filename": "pinkie3.png",
+	"frame": {"x":356,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "pinkie.png",
+	"format": "RGBA8888",
+	"size": {"w":534,"h":197},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:6a797a986f61a3100dbff82ef481c5b9:69a71a3109438aaa3a2082209fcab311:dad2af1e7a6503f7743c40b497696dfd$"
+}
+}

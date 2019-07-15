@@ -1,0 +1,36 @@
+{"frames": [
+
+{
+	"filename": "flyingPixie_1.png",
+	"frame": {"x":0,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+},
+{
+	"filename": "flyingPixie_2.png",
+	"frame": {"x":178,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+},
+{
+	"filename": "flyingPixie_3.png",
+	"frame": {"x":356,"y":0,"w":178,"h":197},
+	"rotated": false,
+	"trimmed": false,
+	"spriteSourceSize": {"x":0,"y":0,"w":178,"h":197},
+	"sourceSize": {"w":178,"h":197}
+}],
+"meta": {
+	"app": "https://www.codeandweb.com/texturepacker",
+	"version": "1.0",
+	"image": "default.png",
+	"format": "RGBA8888",
+	"size": {"w":534,"h":197},
+	"scale": "1",
+	"smartupdate": "$TexturePacker:SmartUpdate:ee260d9112b084ea71b3bdb674c64cc9:73b22d281187569aaef976e1e1fdf408:f77e03ced7ab6aec314ad4378697df39$"
+}
+}
