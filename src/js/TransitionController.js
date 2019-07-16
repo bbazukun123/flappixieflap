@@ -15,12 +15,15 @@ export default class TransitionController{
 
         //Utility variables
         this.skinSprite = null;
-        this.gameScore = null;
         this.characterSprite = null;
+        this.gameScore = null;
+        this.counterTexts = [];
         this.transitionDuration = 30;
-        this.popDuration = 300;
+        this.popDuration = 15;
+        this.countDownDuration = 25;
         this.backdropOn = false;
         this.deltaCounter = 0;
+        this.countDownCounter = 0;
         this.transition = null;
 
         this.setupForTransition();
@@ -40,6 +43,32 @@ export default class TransitionController{
         this.backdrop.zIndex = 1;
         this.app.stage.sortChildren();
         this.backdrop.alpha = 0;
+
+    }
+
+    setupUIReferences(){
+
+        this.gameScore = this.gameController.uiController.gameScore;
+
+        this.counterTexts.push(this.gameController.uiController.three);
+        this.counterTexts.push(this.gameController.uiController.two);
+        this.counterTexts.push(this.gameController.uiController.one);
+        this.counterTexts.push(this.gameController.uiController.go);
+
+        this.resetCounter();
+
+    }
+
+    resetCounter(){
+
+        this.gameScore.alpha = 0;
+
+        this.counterTexts.forEach(text => {
+            text.alpha = 0;
+            text.scale.set(1);
+        })
+
+        this.countDownCounter = 0;
 
     }
 
@@ -74,9 +103,15 @@ export default class TransitionController{
 
         this.transition = delta => {
 
-            if(this.skinSprite.scale > 0){
-                this.skinSprite.scale -= (delta/this.popDuration) * this.skinSprite.originalScale;
-            }else{
+            //WIP Scaling Exit Animation
+            /* if(this.skinSprite.scale.x > 0){
+
+                const scale = (delta/this.popDuration) * this.skinSprite.originalScale;
+
+                this.skinSprite.scale.x -= scale;
+                this.skinSprite.scale.y -= scale;
+
+            }else{ */
 
                 if(this.backdrop.alpha < 1 && !this.backdropOn)
                     this.backdrop.alpha += (delta/this.transitionDuration) * 1;
@@ -90,14 +125,21 @@ export default class TransitionController{
                         this.backdrop.alpha -= (delta/this.transitionDuration) * 1;
                     else{
 
-                        this.transition = null;
-                        this.backdropOn = false;
-                        this.gameController.state = this.gameController.gameScene;
+                        if(this.countDownCounter < 4)
+                            this.countDown(delta);
+                        else{
 
+                            this.transition = null;
+                            this.backdropOn = false;
+                            this.gameController.state = this.gameController.gameScene;
+
+                        }
+                        
                     }
 
                 }
-            }
+
+            /* } */
 
         }
 
@@ -130,7 +172,6 @@ export default class TransitionController{
                 this.backdropOn = true;
                 this.endScene.alpha = 0;
                 this.endScene.visible = false;
-                this.gameScore.alpha = 1;
                 this.gameScene.visible = false;
                 this.gameController.resetGame();
                 this.mainMenuScene.visible = true;
@@ -160,21 +201,53 @@ export default class TransitionController{
                 this.backdropOn = true;
                 this.endScene.alpha = 0;
                 this.endScene.visible = false;
-                this.gameScore.alpha = 1;
                 this.gameController.resetGame();   
 
                 if(this.backdrop.alpha > 0)
                     this.backdrop.alpha -= (delta/this.transitionDuration) * 1;
                 else{
 
-                    this.transition = null;
-                    this.backdropOn = false;
-                    this.gameController.state = this.gameController.gameScene;
+                    if(this.countDownCounter < 4)
+                        this.countDown(delta);
+                    else{
+
+                        this.transition = null;
+                        this.backdropOn = false;
+                        this.gameController.state = this.gameController.gameScene;
+
+                    }
                     
                 }
 
             }
 
+        }
+
+    }
+
+    //Animates countdown timer sequence at the start of each gameplay
+    countDown(delta){
+
+        const currentText = this.counterTexts[this.countDownCounter];
+        const previousText = this.counterTexts[this.countDownCounter - 1];
+
+        if(previousText && previousText.alpha > 0)
+            previousText.alpha -= (delta * (5/6)/this.countDownDuration) * 1;
+        else{
+
+            if(currentText.alpha < 1){
+
+                currentText.alpha += (delta/this.countDownDuration) * 1;
+
+                if(currentText.scale.x > 0.5){
+                    currentText.scale.x -= (delta/this.countDownDuration) * 1;
+                    currentText.scale.y -= (delta/this.countDownDuration) * 1;
+                }
+
+            }
+            else
+                this.countDownCounter++;
+        
         }
 
     }
@@ -215,6 +288,7 @@ export default class TransitionController{
     
     } */
 
+    //Animation Loop
     animate(delta){
 
         //Paired with the fade()

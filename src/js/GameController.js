@@ -74,6 +74,8 @@ export default class GameController{
         this.sceneContainers["Game"] = gameSceneContainer;
         this.sceneContainers["End"] = endSceneContainer;
 
+        this.sceneContainers["Game"].sortableChildren = true;
+
         Object.values(this.sceneContainers).forEach(container => {
             container.visible = false; // Initially hides all the scenes
             this.app.stage.addChild(container);
@@ -93,7 +95,7 @@ export default class GameController{
     changeState(newState){
         
         this.activeSceneContainer = this.sceneContainers[newState];
-        console.log(this.activeSceneContainer);
+
         //Some state re-assignments are moved into the transition functions to accomodate the transitioning animations 
         switch(newState){
 
@@ -122,6 +124,7 @@ export default class GameController{
                 break;
 
             case "End":
+                this.state = null;
                 this.activeSceneContainer.visible = true;
                 this.transitionController.gameToEndScene();
                 break;
@@ -185,7 +188,7 @@ export default class GameController{
         }
 
         //Shift the focus to the next set of obstacle poles once passed
-        if(minCharacterX > maxObstacleX)
+        if(character.x > maxObstacleX)
             this.mapController.collisionTestIndex++;
 
         return inXBound && inYBound;
@@ -209,7 +212,8 @@ export default class GameController{
     gameLoop(delta){
 
         this.accumulatedDelta += delta;
-        this.state(delta);
+        if(this.state)
+            this.state(delta);
         this.transitionController.animate(delta);
 
     }
@@ -238,6 +242,13 @@ export default class GameController{
         if(!this.characterController.isDead() && !this.isCollided()){
             this.mapController.mapLoop(delta);
             this.scoring();
+
+            //Hacky Solution! ** NTF: Fix this ASAP!
+            if(this.uiController.go.alpha > 0){
+                this.uiController.go.alpha -= (delta/40);
+                this.uiController.gameScore.alpha += (delta/40);
+            }
+                
         }else if(!this.sceneContainers["End"].visible){
 
             this.characterController.dead();
@@ -246,6 +257,7 @@ export default class GameController{
                 this.dataController.highscore = this.score;
 
             if(this.characterController.isDead()){
+                this.transitionController.resetCounter();
                 this.uiController.resetEndMenu();
                 this.changeState("End");
             }

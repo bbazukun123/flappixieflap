@@ -25,8 +25,9 @@ export default class CharacterController{
         //Setup character containers and animation sprite
         this.characterContainer = new PIXI.Container();
         this.gameController.sceneContainers["Game"].addChild(this.characterContainer);
+        this.characterContainer.zIndex = 1;
+        
         this.characterSprite = new PIXI.AnimatedSprite(this.dataController.selectedSkin);
-
         this.characterSprite.anchor.set(0.5);
         this.characterSprite.pivot.set(0.5);
         this.characterSprite.scale.set(0.6);
@@ -139,6 +140,8 @@ export default class CharacterController{
 
     }
     
+    /* ------------------------------ UTILITIES ------------------------------ */
+
     get posX(){
         return this.characterSprite.x;
     }
@@ -151,6 +154,22 @@ export default class CharacterController{
         this.characterSprite.y = newY;
     }
 
+    dead(){
+        this.gameController.scoringActive = false;
+        this.deactivateControls();
+        this.velocity = 10;
+    }
+
+    isDead(){
+
+        if(this.characterSprite.y > this.app.renderer.screen.height + this.characterSprite.height){
+            /* console.log("Dead"); */
+            return true;
+        }
+
+    }
+
+    //Physics Loop
     characterPhysics(delta){
 
         if(this.velocity < 50)
@@ -173,21 +192,6 @@ export default class CharacterController{
             this.characterSprite.rotation += Math.PI / 100; */
         /* this.characterSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1)); */
         
-    }
-
-    dead(){
-        this.gameController.scoringActive = false;
-        this.deactivateControls();
-        this.velocity = 10;
-    }
-
-    isDead(){
-
-        if(this.characterSprite.y > this.app.renderer.screen.height + this.characterSprite.height){
-            /* console.log("Dead"); */
-            return true;
-        }
-
     }
 
 }

@@ -27,6 +27,12 @@ export default class UIController{
         this.createInGameUI();
         this.createEndMenu();
 
+        //Setup references for transition controller after UI elements are created
+        this.gameController.transitionController.setupUIReferences();
+
+        //Arrange UI layer order accordingly (& Character container)
+        this.gameController.sceneContainers["Game"].sortChildren();
+
     }
 
     createFontStyles(){
@@ -57,6 +63,7 @@ export default class UIController{
         this.fontStyles.push(baseStyle(90,10));
         this.fontStyles.push(baseStyle(30,8));
         this.fontStyles.push(baseStyle(70,8));
+        this.fontStyles.push(baseStyle(400,20));
 
     }
 
@@ -148,10 +155,46 @@ export default class UIController{
         this.gameScore.x = this.app.renderer.screen.width / 2;
         this.gameScore.y = 30;
         this.gameController.sceneContainers["Game"].addChild(this.gameScore);
-        this.gameController.transitionController.gameScore = this.gameScore;
-        this.gameScore.parent.sortableChildren = true;
-        this.gameScore.zIndex = 1;
-        this.gameScore.parent.sortChildren();
+        this.gameScore.zIndex = 2;
+        
+
+        //Count down texts
+        this.three = new PIXI.Text("3", this.fontStyles[4]);
+        this.three.anchor.set(0.5);
+        this.gameController.adjustSprite(this.three);
+        this.three.x = this.app.renderer.screen.width / 2;
+        this.three.y = this.app.renderer.screen.height / 2;
+        this.gameController.sceneContainers["Game"].addChild(this.three);
+        this.gameController.transitionController.three = this.three;
+
+        this.two = new PIXI.Text("2", this.fontStyles[4]);
+        this.two.anchor.set(0.5);
+        this.gameController.adjustSprite(this.two);
+        this.two.x = this.app.renderer.screen.width / 2;
+        this.two.y = this.app.renderer.screen.height / 2;
+        this.gameController.sceneContainers["Game"].addChild(this.two);
+        this.gameController.transitionController.two = this.two;
+
+        this.one = new PIXI.Text("1", this.fontStyles[4]);
+        this.one.anchor.set(0.5);
+        this.gameController.adjustSprite(this.one);
+        this.one.x = this.app.renderer.screen.width / 2;
+        this.one.y = this.app.renderer.screen.height / 2;
+        this.gameController.sceneContainers["Game"].addChild(this.one);
+        this.gameController.transitionController.one = this.one;
+
+        this.go = new PIXI.Text("GO!", this.fontStyles[4]);
+        this.go.anchor.set(0.5);
+        this.gameController.adjustSprite(this.go);
+        this.go.x = this.app.renderer.screen.width / 2;
+        this.go.y = this.app.renderer.screen.height / 2;
+        this.gameController.sceneContainers["Game"].addChild(this.go);
+        this.gameController.transitionController.one = this.go;
+
+        this.three.zIndex = 2;
+        this.two.zIndex = 2;
+        this.one.zIndex = 2;
+        this.go.zIndex = 2;
 
     }
 
@@ -256,7 +299,8 @@ export default class UIController{
         this.score2.text = this.gameController.score;
         this.best.text = "Best: " + this.dataController.highscore;
     }   
-
+    
+    //Animation Loop
     menuLoop(delta){
         this.skinSprite.y = (this.app.renderer.screen.height / 2) + (Math.sin((this.gameController.accumulatedDelta / 20)) * 6);
         this.skinSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1));

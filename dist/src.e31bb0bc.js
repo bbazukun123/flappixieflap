@@ -41777,6 +41777,7 @@ function () {
       //Setup character containers and animation sprite
       this.characterContainer = new PIXI.Container();
       this.gameController.sceneContainers["Game"].addChild(this.characterContainer);
+      this.characterContainer.zIndex = 1;
       this.characterSprite = new PIXI.AnimatedSprite(this.dataController.selectedSkin);
       this.characterSprite.anchor.set(0.5);
       this.characterSprite.pivot.set(0.5);
@@ -41883,19 +41884,8 @@ function () {
     value: function jump() {
       if (this.characterSprite.y > -(this.app.renderer.screen.height / 3)) this.velocity = -(this.jumpVelocity * this.gameController.scaleFactor);
     }
-  }, {
-    key: "characterPhysics",
-    value: function characterPhysics(delta) {
-      if (this.velocity < 50) this.velocity += this.gravity * delta * this.gameController.scaleFactor;
-      if (this.characterSprite.y < this.app.renderer.screen.height + this.characterSprite.height) this.posY += this.velocity * delta * this.gameController.scaleFactor;
-      if (this.characterSprite.rotation < 0) this.characterSprite.rotation = 0;
-      this.characterSprite.rotation += this.velocity / 300 * delta;
-      if (this.characterSprite.rotation > Math.PI / 20) this.characterSprite.rotation = Math.PI / 20;
-      /* if(this.characterSprite.rotation < Math.PI / 8)
-          this.characterSprite.rotation += Math.PI / 100; */
+    /* ------------------------------ UTILITIES ------------------------------ */
 
-      /* this.characterSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1)); */
-    }
   }, {
     key: "dead",
     value: function dead() {
@@ -41910,6 +41900,20 @@ function () {
         /* console.log("Dead"); */
         return true;
       }
+    } //Physics Loop
+
+  }, {
+    key: "characterPhysics",
+    value: function characterPhysics(delta) {
+      if (this.velocity < 50) this.velocity += this.gravity * delta * this.gameController.scaleFactor;
+      if (this.characterSprite.y < this.app.renderer.screen.height + this.characterSprite.height) this.posY += this.velocity * delta * this.gameController.scaleFactor;
+      if (this.characterSprite.rotation < 0) this.characterSprite.rotation = 0;
+      this.characterSprite.rotation += this.velocity / 300 * delta;
+      if (this.characterSprite.rotation > Math.PI / 20) this.characterSprite.rotation = Math.PI / 20;
+      /* if(this.characterSprite.rotation < Math.PI / 8)
+          this.characterSprite.rotation += Math.PI / 100; */
+
+      /* this.characterSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1)); */
     }
   }, {
     key: "posX",
@@ -42319,7 +42323,11 @@ function () {
 
       this.createMainMenu();
       this.createInGameUI();
-      this.createEndMenu();
+      this.createEndMenu(); //Setup references for transition controller after UI elements are created
+
+      this.gameController.transitionController.setupUIReferences(); //Arrange UI layer order accordingly (& Character container)
+
+      this.gameController.sceneContainers["Game"].sortChildren();
     }
   }, {
     key: "createFontStyles",
@@ -42349,6 +42357,7 @@ function () {
       this.fontStyles.push(baseStyle(90, 10));
       this.fontStyles.push(baseStyle(30, 8));
       this.fontStyles.push(baseStyle(70, 8));
+      this.fontStyles.push(baseStyle(400, 20));
     }
   }, {
     key: "createMainMenu",
@@ -42434,10 +42443,40 @@ function () {
       this.gameScore.x = this.app.renderer.screen.width / 2;
       this.gameScore.y = 30;
       this.gameController.sceneContainers["Game"].addChild(this.gameScore);
-      this.gameController.transitionController.gameScore = this.gameScore;
-      this.gameScore.parent.sortableChildren = true;
-      this.gameScore.zIndex = 1;
-      this.gameScore.parent.sortChildren();
+      this.gameScore.zIndex = 2; //Count down texts
+
+      this.three = new PIXI.Text("3", this.fontStyles[4]);
+      this.three.anchor.set(0.5);
+      this.gameController.adjustSprite(this.three);
+      this.three.x = this.app.renderer.screen.width / 2;
+      this.three.y = this.app.renderer.screen.height / 2;
+      this.gameController.sceneContainers["Game"].addChild(this.three);
+      this.gameController.transitionController.three = this.three;
+      this.two = new PIXI.Text("2", this.fontStyles[4]);
+      this.two.anchor.set(0.5);
+      this.gameController.adjustSprite(this.two);
+      this.two.x = this.app.renderer.screen.width / 2;
+      this.two.y = this.app.renderer.screen.height / 2;
+      this.gameController.sceneContainers["Game"].addChild(this.two);
+      this.gameController.transitionController.two = this.two;
+      this.one = new PIXI.Text("1", this.fontStyles[4]);
+      this.one.anchor.set(0.5);
+      this.gameController.adjustSprite(this.one);
+      this.one.x = this.app.renderer.screen.width / 2;
+      this.one.y = this.app.renderer.screen.height / 2;
+      this.gameController.sceneContainers["Game"].addChild(this.one);
+      this.gameController.transitionController.one = this.one;
+      this.go = new PIXI.Text("GO!", this.fontStyles[4]);
+      this.go.anchor.set(0.5);
+      this.gameController.adjustSprite(this.go);
+      this.go.x = this.app.renderer.screen.width / 2;
+      this.go.y = this.app.renderer.screen.height / 2;
+      this.gameController.sceneContainers["Game"].addChild(this.go);
+      this.gameController.transitionController.one = this.go;
+      this.three.zIndex = 2;
+      this.two.zIndex = 2;
+      this.one.zIndex = 2;
+      this.go.zIndex = 2;
     }
   }, {
     key: "createEndMenu",
@@ -42530,7 +42569,8 @@ function () {
     value: function resetEndMenu() {
       this.score2.text = this.gameController.score;
       this.best.text = "Best: " + this.dataController.highscore;
-    }
+    } //Animation Loop
+
   }, {
     key: "menuLoop",
     value: function menuLoop(delta) {
@@ -42834,12 +42874,15 @@ function () {
     this.endScene = gameController.sceneContainers["End"]; //Utility variables
 
     this.skinSprite = null;
-    this.gameScore = null;
     this.characterSprite = null;
+    this.gameScore = null;
+    this.counterTexts = [];
     this.transitionDuration = 30;
-    this.popDuration = 300;
+    this.popDuration = 15;
+    this.countDownDuration = 25;
     this.backdropOn = false;
     this.deltaCounter = 0;
+    this.countDownCounter = 0;
     this.transition = null;
     this.setupForTransition();
   }
@@ -42857,6 +42900,26 @@ function () {
       this.backdrop.zIndex = 1;
       this.app.stage.sortChildren();
       this.backdrop.alpha = 0;
+    }
+  }, {
+    key: "setupUIReferences",
+    value: function setupUIReferences() {
+      this.gameScore = this.gameController.uiController.gameScore;
+      this.counterTexts.push(this.gameController.uiController.three);
+      this.counterTexts.push(this.gameController.uiController.two);
+      this.counterTexts.push(this.gameController.uiController.one);
+      this.counterTexts.push(this.gameController.uiController.go);
+      this.resetCounter();
+    }
+  }, {
+    key: "resetCounter",
+    value: function resetCounter() {
+      this.gameScore.alpha = 0;
+      this.counterTexts.forEach(function (text) {
+        text.alpha = 0;
+        text.scale.set(1);
+      });
+      this.countDownCounter = 0;
     }
     /* ------------------------------ INDIVIDUAL TRANSITION SEQUENCES ------------------------------ */
 
@@ -42883,20 +42946,26 @@ function () {
       var _this2 = this;
 
       this.transition = function (delta) {
-        if (_this2.skinSprite.scale > 0) {
-          _this2.skinSprite.scale -= delta / _this2.popDuration * _this2.skinSprite.originalScale;
-        } else {
-          if (_this2.backdrop.alpha < 1 && !_this2.backdropOn) _this2.backdrop.alpha += delta / _this2.transitionDuration * 1;else {
-            _this2.backdropOn = true;
-            _this2.mainMenuScene.visible = false;
-            _this2.gameScene.visible = true;
-            if (_this2.backdrop.alpha > 0) _this2.backdrop.alpha -= delta / _this2.transitionDuration * 1;else {
+        //WIP Scaling Exit Animation
+
+        /* if(this.skinSprite.scale.x > 0){
+              const scale = (delta/this.popDuration) * this.skinSprite.originalScale;
+              this.skinSprite.scale.x -= scale;
+            this.skinSprite.scale.y -= scale;
+          }else{ */
+        if (_this2.backdrop.alpha < 1 && !_this2.backdropOn) _this2.backdrop.alpha += delta / _this2.transitionDuration * 1;else {
+          _this2.backdropOn = true;
+          _this2.mainMenuScene.visible = false;
+          _this2.gameScene.visible = true;
+          if (_this2.backdrop.alpha > 0) _this2.backdrop.alpha -= delta / _this2.transitionDuration * 1;else {
+            if (_this2.countDownCounter < 4) _this2.countDown(delta);else {
               _this2.transition = null;
               _this2.backdropOn = false;
               _this2.gameController.state = _this2.gameController.gameScene;
             }
           }
         }
+        /* } */
       };
     }
   }, {
@@ -42923,7 +42992,6 @@ function () {
           _this4.backdropOn = true;
           _this4.endScene.alpha = 0;
           _this4.endScene.visible = false;
-          _this4.gameScore.alpha = 1;
           _this4.gameScene.visible = false;
 
           _this4.gameController.resetGame();
@@ -42947,17 +43015,35 @@ function () {
           _this5.backdropOn = true;
           _this5.endScene.alpha = 0;
           _this5.endScene.visible = false;
-          _this5.gameScore.alpha = 1;
 
           _this5.gameController.resetGame();
 
           if (_this5.backdrop.alpha > 0) _this5.backdrop.alpha -= delta / _this5.transitionDuration * 1;else {
-            _this5.transition = null;
-            _this5.backdropOn = false;
-            _this5.gameController.state = _this5.gameController.gameScene;
+            if (_this5.countDownCounter < 4) _this5.countDown(delta);else {
+              _this5.transition = null;
+              _this5.backdropOn = false;
+              _this5.gameController.state = _this5.gameController.gameScene;
+            }
           }
         }
       };
+    } //Animates countdown timer sequence at the start of each gameplay
+
+  }, {
+    key: "countDown",
+    value: function countDown(delta) {
+      var currentText = this.counterTexts[this.countDownCounter];
+      var previousText = this.counterTexts[this.countDownCounter - 1];
+      if (previousText && previousText.alpha > 0) previousText.alpha -= delta * (5 / 6) / this.countDownDuration * 1;else {
+        if (currentText.alpha < 1) {
+          currentText.alpha += delta / this.countDownDuration * 1;
+
+          if (currentText.scale.x > 0.5) {
+            currentText.scale.x -= delta / this.countDownDuration * 1;
+            currentText.scale.y -= delta / this.countDownDuration * 1;
+          }
+        } else this.countDownCounter++;
+      }
     } //No Longer used but could come in handy
 
     /* fade(container,duration){
@@ -42985,6 +43071,7 @@ function () {
           })());    
     
     } */
+    //Animation Loop
 
   }, {
     key: "animate",
@@ -43094,6 +43181,7 @@ function () {
       this.sceneContainers["MainMenu"] = mainMenuSceneContainer;
       this.sceneContainers["Game"] = gameSceneContainer;
       this.sceneContainers["End"] = endSceneContainer;
+      this.sceneContainers["Game"].sortableChildren = true;
       Object.values(this.sceneContainers).forEach(function (container) {
         container.visible = false; // Initially hides all the scenes
 
@@ -43111,8 +43199,7 @@ function () {
   }, {
     key: "changeState",
     value: function changeState(newState) {
-      this.activeSceneContainer = this.sceneContainers[newState];
-      console.log(this.activeSceneContainer); //Some state re-assignments are moved into the transition functions to accomodate the transitioning animations 
+      this.activeSceneContainer = this.sceneContainers[newState]; //Some state re-assignments are moved into the transition functions to accomodate the transitioning animations 
 
       switch (newState) {
         case "Loading":
@@ -43142,6 +43229,7 @@ function () {
           break;
 
         case "End":
+          this.state = null;
           this.activeSceneContainer.visible = true;
           this.transitionController.gameToEndScene();
           break;
@@ -43192,7 +43280,7 @@ function () {
       } //Shift the focus to the next set of obstacle poles once passed
 
 
-      if (minCharacterX > maxObstacleX) this.mapController.collisionTestIndex++;
+      if (character.x > maxObstacleX) this.mapController.collisionTestIndex++;
       return inXBound && inYBound;
     } //Resets the character and map assets, as well as some of the utility variables
 
@@ -43212,7 +43300,7 @@ function () {
     key: "gameLoop",
     value: function gameLoop(delta) {
       this.accumulatedDelta += delta;
-      this.state(delta);
+      if (this.state) this.state(delta);
       this.transitionController.animate(delta);
     }
   }, {
@@ -43238,12 +43326,18 @@ function () {
 
       if (!this.characterController.isDead() && !this.isCollided()) {
         this.mapController.mapLoop(delta);
-        this.scoring();
+        this.scoring(); //Hacky Solution! ** NTF: Fix this ASAP!
+
+        if (this.uiController.go.alpha > 0) {
+          this.uiController.go.alpha -= delta / 40;
+          this.uiController.gameScore.alpha += delta / 40;
+        }
       } else if (!this.sceneContainers["End"].visible) {
         this.characterController.dead();
         if (this.score > this.dataController.highscore) this.dataController.highscore = this.score;
 
         if (this.characterController.isDead()) {
+          this.transitionController.resetCounter();
           this.uiController.resetEndMenu();
           this.changeState("End");
         }
@@ -43303,7 +43397,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "65084" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54081" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
