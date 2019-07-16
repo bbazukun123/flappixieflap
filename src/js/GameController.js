@@ -178,7 +178,7 @@ export default class GameController{
         let inXBound = false;
         let inYBound = true;
 
-        if((maxCharacterX > minObstacleX && maxCharacterX < maxObstacleX) || (minCharacterX > minObstacleX && maxCharacterX < maxObstacleX)){
+        if((maxCharacterX > minObstacleX && maxCharacterX < maxObstacleX) || (minCharacterX > minObstacleX && minCharacterX < maxObstacleX)){
 
             inXBound = true;
 

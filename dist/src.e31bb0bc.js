@@ -43274,7 +43274,7 @@ function () {
       var inXBound = false;
       var inYBound = true;
 
-      if (maxCharacterX > minObstacleX && maxCharacterX < maxObstacleX || minCharacterX > minObstacleX && maxCharacterX < maxObstacleX) {
+      if (maxCharacterX > minObstacleX && maxCharacterX < maxObstacleX || minCharacterX > minObstacleX && minCharacterX < maxObstacleX) {
         inXBound = true;
         if (minCharacterY > minGapY && minCharacterY < maxGapY && maxCharacterY > minGapY && maxCharacterY < maxGapY) inYBound = false; //Check whether the players is in the Y range of the gap between the poles (safe-zone) rather than on the obstacles like for X range
       } //Shift the focus to the next set of obstacle poles once passed
@@ -43397,7 +43397,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54081" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "58923" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
