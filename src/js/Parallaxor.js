@@ -1,35 +1,44 @@
 import * as PIXI from 'pixi.js'
 
+/* For setting up and animating the parallax backgrounds and foregrounds */
 export default class Parallaxor{
 
     constructor(gameController){
 
+        //Back-references
         this.gameController = gameController;
         this.dataController = gameController.dataController;  
         this.app = gameController.app;
 
+        //Utility variables
         this.tiles = [];
         this.spawns = [];
 
     }
 
+    //Generate parallax backgrounds according to the supplied map
     setupParallax({map,scenery,scrollVelocity}){
 
         this.scrollVelocity = scrollVelocity;
 
+        //Setups separate backgrounds and foregrounds containers
         this.backgroundsContainer = new PIXI.Container();
         this.foregroundsContainer = new PIXI.Container();
         this.gameController.sceneContainers["Game"].addChild(this.backgroundsContainer);
         this.gameController.sceneContainers["Game"].addChild(this.foregroundsContainer);
+
+        //Set the containers' layer order accordingly
         this.backgroundsContainer.parent.setChildIndex(this.backgroundsContainer, 0);
         this.foregroundsContainer.parent.setChildIndex(this.backgroundsContainer, this.foregroundsContainer.parent.numChildren - 1);
 
         const mapTextures = this.dataController.loader.resources[`map_${map}`].textures;
 
+        //Loops through each individual background element to generate and lay it out accordingly
         scenery.forEach(element => {
 
             const texture = mapTextures[element.texture];
             
+            //For single decoration objects -> uses sprites pooling 
             if(element.type === "spawn"){
 
                 const spawnContainer = new PIXI.Container();
@@ -62,18 +71,17 @@ export default class Parallaxor{
 
             }
 
+            //Else, uses tiling sprites
+
             const elementSprite = new PIXI.TilingSprite(texture,texture.width,texture.height);
 
             if(element.position === "fill"){
                 elementSprite.scale.set(this.app.renderer.screen.height/elementSprite.height);
             }else{
-                /*FIX PLEASE!!!!*/
+                //FIX PLEASE!!!!
                 elementSprite.scale.set(this.gameController.scaleFactor);
-                this.setPosition(elementSprite,element.position,element.offset);     
+                this.setPosition(elementSprite,element.position,element.offset);
             }
-
-            /* elementSprite.cacheAsBitmap = true; */
-            /* elementSprite.clampMargin = -0.5;  */
 
             if(element.layer === "background"){
 
@@ -95,11 +103,11 @@ export default class Parallaxor{
 
             }
             
-
         });
 
     }
 
+    //Set Y-position of the inputted element
     setPosition(sprite,position,offset){
 
         if(position === "top"){
@@ -112,32 +120,34 @@ export default class Parallaxor{
 
     }
 
+    //Animation Loop
     parallaxLoop(delta){
 
+        //Scrolls individual tiling sprite background element infinitely
         this.tiles.forEach(tile => {
             tile.sprite.tilePosition.x -= this.scrollVelocity * (this.gameController.scaleFactor/tile.distance) * delta;
         });
 
+        //Moves and pools individual decoration sprite along the X-axis
         this.spawns.forEach(spawn => {
 
             const spawnSprites = spawn.container.children;
 
+            //Moves
             spawnSprites.forEach(sprite => {
                 sprite.position.x -= this.scrollVelocity * ( this.gameController.scaleFactor/spawn.distance) * delta;
             });
 
+            //Pools if completely out of the stage
             if((spawnSprites[0].position.x + spawnSprites[0].width) < 0){
 
                 const respawnSprite = spawnSprites.shift();
-
                 respawnSprite.position.x = spawnSprites[spawnSprites.length-1].position.x + (spawn.spawnGap * this.gameController.scaleFactor);
-
                 spawnSprites.push(respawnSprite);
 
             }
 
         });
-
 
     }
 

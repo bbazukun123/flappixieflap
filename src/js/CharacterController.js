@@ -26,7 +26,7 @@ export default class CharacterController{
         this.characterContainer = new PIXI.Container();
         this.gameController.sceneContainers["Game"].addChild(this.characterContainer);
         this.characterContainer.zIndex = 1;
-        
+
         this.characterSprite = new PIXI.AnimatedSprite(this.dataController.selectedSkin);
         this.characterSprite.anchor.set(0.5);
         this.characterSprite.pivot.set(0.5);
@@ -36,18 +36,20 @@ export default class CharacterController{
         this.characterSprite.animationSpeed = 0.5;
         this.characterSprite.play();
     
-        this.activateControls();
+        this.setupControls();
 
     }
 
-    //
-    activateControls(){
+    //Setup control input listeners
+    setupControls(){
 
+        //For mouse clicks
         this.app.stage.interactive = true;
-        /* this.app.stage.onFuntion = this.jump.bind(this); */
         this.app.stage.on("pointerdown", () => {
             this.jump();
         });
+
+        //For Spacebar key presses
         this.spaceKey = keyboard(" ");
         this.spaceKey.press = () => {
             this.jump();
@@ -55,31 +57,39 @@ export default class CharacterController{
 
         //Borrowed from KittyKatAttack [https://github.com/kittykatattack/learningPixi#keyboard]
         function keyboard(value) {
+
             let key = {};
             key.value = value;
             key.isDown = false;
             key.isUp = true;
             key.press = undefined;
             key.release = undefined;
+
             //The `downHandler`
             key.downHandler = event => {
                 if (event.key === key.value) {
+
                     if (key.isUp && key.press)
                         key.press();
+
                     key.isDown = true;
                     key.isUp = false;
                     event.preventDefault();
+
                 }
             };
 
             //The `upHandler`
             key.upHandler = event => {
                 if (event.key === key.value) {
+
                     if (key.isDown && key.release)
                         key.release();
+
                     key.isDown = false;
                     key.isUp = true;
                     event.preventDefault();
+
                 }
             };
 
@@ -87,13 +97,20 @@ export default class CharacterController{
             const downListener = key.downHandler.bind(key);
             const upListener = key.upHandler.bind(key);
             
-            window.addEventListener(
-                "keydown", downListener, false
-            );
-            window.addEventListener(
-                "keyup", upListener, false
-            );
-            
+            key.subscribe = () => {
+
+                window.addEventListener(
+                    "keydown", downListener, false
+                );
+
+                window.addEventListener(
+                    "keyup", upListener, false
+                );
+
+            };
+
+            key.subscribe();
+
             // Detach event listeners
             key.unsubscribe = () => {
                 window.removeEventListener("keydown", downListener);
@@ -101,27 +118,31 @@ export default class CharacterController{
             };
             
             return key;
+
         }
 
     }
 
+    //Deactivates control input listeners
     deactivateControls(){
-        /* this.app.stage.off("pointerdown", this.app.stage.onFuntion); */
         this.app.stage.interactive = false;
         this.spaceKey.unsubscribe();
     }
 
-    deactivateControls(){
-        /* this.app.stage.off("pointerdown", this.app.stage.onFuntion); */
-        this.app.stage.interactive = false;
-        this.spaceKey.unsubscribe();
+    //Reactivates control input listeners
+    reactivateControls(){
+        this.app.stage.interactive = true;
+        this.spaceKey.subscribe();
     }
 
+    //Updates character's animated sprite
     changeSkin(selectedSkin){
         this.characterSprite.texture = selectedSkin;
     }
 
+    //Resets character transforms, stats and reactivate listeners
     resetCharacter(){
+
         this.velocity = 0;
         this.gameController.scoringActive = true;
         this.characterSprite.rotation = 0;
@@ -130,8 +151,11 @@ export default class CharacterController{
         this.characterSprite.x = this.app.renderer.screen.width * 0.30;
         this.characterSprite.y = this.app.renderer.screen.height / 2;
 
-        this.activateControls();
+        this.reactivateControls();
+
     }
+
+    /* ------------------------------ CHARACTER ACTIONS ------------------------------ */
 
     jump(){
 
@@ -154,12 +178,14 @@ export default class CharacterController{
         this.characterSprite.y = newY;
     }
 
+    //Stop the listeners and scorer, and plunge the character off the screen
     dead(){
         this.gameController.scoringActive = false;
         this.deactivateControls();
         this.velocity = 10;
     }
 
+    //Checks whether the character falls completely off the screen or not
     isDead(){
 
         if(this.characterSprite.y > this.app.renderer.screen.height + this.characterSprite.height){
@@ -172,12 +198,15 @@ export default class CharacterController{
     //Physics Loop
     characterPhysics(delta){
 
+        //Downwards acceleration
         if(this.velocity < 50)
             this.velocity += (this.gravity * delta) * this.gameController.scaleFactor;
 
+        //Move character according to any resulted velocity
         if(this.characterSprite.y < this.app.renderer.screen.height + this.characterSprite.height)
             this.posY += (this.velocity * delta) * this.gameController.scaleFactor;
 
+        //Some rotation touches
         if(this.characterSprite.rotation < 0)
             this.characterSprite.rotation = 0;
 
@@ -186,11 +215,6 @@ export default class CharacterController{
         if(this.characterSprite.rotation > Math.PI / 20)
             this.characterSprite.rotation = Math.PI / 20;
 
-
-
-        /* if(this.characterSprite.rotation < Math.PI / 8)
-            this.characterSprite.rotation += Math.PI / 100; */
-        /* this.characterSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1)); */
         
     }
 
