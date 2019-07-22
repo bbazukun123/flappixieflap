@@ -5,8 +5,9 @@ This repo contains codes and assets for the **test game for Goodboy Digital**. [
 ## Existing Issues
 
 * Dynamic text rendering and texture cropping issues
-* Tiling sprites' progressive rendering issue on mobile devices (Galaxy S8)
-* Minor jump inconsistency between desktop and mobile versions
+* Tiling sprites' progressive rendering issue on mobile phones (Galaxy S8) - Works fine on Desktop & iPad
+* Minor sound delay on mobile phone
+* Minor jump inconsistency between desktop and mobile phone versions - 
 
 ## Update Log
 
