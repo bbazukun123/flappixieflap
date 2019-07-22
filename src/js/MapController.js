@@ -25,6 +25,7 @@ export default class MapController{
         this.obstacleCounter = 0;
         this.scoringIndex = 0;
         this.collisionTestIndex = 0;
+        this.velocityMultiplier = 1; //Hackily breaks the scrolling after death
         
         //Setup map once resources loading completes
         this.dataController.loader.load(this.setupMaps.bind(this));
@@ -76,6 +77,7 @@ export default class MapController{
     resetMap(){
 
         //Resets map controller stats and trackers
+        this.velocityMultiplier = 1;
         this.obstacleCounter = 0;
         this.obstacleBehaviours = [];
         this.scoringIndex = 0;
@@ -176,11 +178,21 @@ export default class MapController{
         obstacleContainers.forEach(obstacle => {
 
             this.animateObstacle(obstacle,this.obstacleBehaviours[id]);
-            obstacle.position.x -= this.scrollVelocity * delta * this.gameController.scaleFactor;
+            obstacle.position.x -= this.scrollVelocity * delta * this.gameController.scaleFactor * this.velocityMultiplier;
 
             id++;
 
         });
+
+        //Breaks the scrolling after character is collided
+        if(!this.gameController.scoringActive){
+
+            this.velocityMultiplier -= delta / 60;
+
+            if(this.velocityMultiplier < 0)
+                this.velocityMultiplier = 0;
+
+        }
 
     }
 

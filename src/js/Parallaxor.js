@@ -78,8 +78,8 @@ export default class Parallaxor{
             if(element.position === "fill"){
                 elementSprite.scale.set(this.app.renderer.screen.height/elementSprite.height);
             }else{
-                //FIX PLEASE!!!!
-                elementSprite.scale.set(this.gameController.scaleFactor);
+                //-0.01 is a very hacky fix to remove the overflowed dark line across a tiling sprite *NTF: urgent need for fixing
+                elementSprite.scale.set(this.gameController.scaleFactor - 0.01);
                 this.setPosition(elementSprite,element.position,element.offset);
             }
 
@@ -123,9 +123,11 @@ export default class Parallaxor{
     //Animation Loop
     parallaxLoop(delta){
 
+        const multiplier = this.gameController.mapController.velocityMultiplier;
+
         //Scrolls individual tiling sprite background element infinitely
         this.tiles.forEach(tile => {
-            tile.sprite.tilePosition.x -= this.scrollVelocity * (this.gameController.scaleFactor/tile.distance) * delta;
+            tile.sprite.tilePosition.x -= this.scrollVelocity * (this.gameController.scaleFactor/tile.distance) * delta * multiplier;
         });
 
         //Moves and pools individual decoration sprite along the X-axis
@@ -135,7 +137,7 @@ export default class Parallaxor{
 
             //Moves
             spawnSprites.forEach(sprite => {
-                sprite.position.x -= this.scrollVelocity * ( this.gameController.scaleFactor/spawn.distance) * delta;
+                sprite.position.x -= (this.scrollVelocity * this.gameController.scaleFactor) * ( this.gameController.scaleFactor/spawn.distance) * delta * multiplier;
             });
 
             //Pools if completely out of the stage

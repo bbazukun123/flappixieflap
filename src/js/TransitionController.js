@@ -25,6 +25,7 @@ export default class TransitionController{
         this.deltaCounter = 0;
         this.countDownCounter = 0;
         this.transition = null;
+        this.soundMuted = false;
 
         this.setupForTransition();
 
@@ -85,6 +86,10 @@ export default class TransitionController{
                 this.backdropOn = true;
                 this.loadingScene.visible = false;
                 this.mainMenuScene.visible = true;
+
+                //Hackily stops the loader animation *NTS: Please search for a better alternative
+                if(this.gameController.uiController.isLoading)
+                    this.gameController.uiController.isLoading = false;
                 
                 if(this.backdrop.alpha > 0)
                     this.backdrop.alpha -= (delta/this.transitionDuration) * 1;
@@ -132,6 +137,7 @@ export default class TransitionController{
                             this.transition = null;
                             this.backdropOn = false;
                             this.gameController.state = this.gameController.gameScene;
+                            this.gameController.characterController.jumpSoundEnabled = true;
 
                         }
                         
@@ -214,6 +220,7 @@ export default class TransitionController{
                         this.transition = null;
                         this.backdropOn = false;
                         this.gameController.state = this.gameController.gameScene;
+                        this.gameController.characterController.jumpSoundEnabled = true;
 
                     }
                     
@@ -245,8 +252,24 @@ export default class TransitionController{
                 }
 
             }
-            else
+            else{
+
                 this.countDownCounter++;
+
+                if(!this.gameController.soundMuted){
+
+                    if(this.countDownCounter == 4){
+                        this.gameController.soundController.goSound();
+                        return;
+                    }
+
+                    this.gameController.soundController.counterSound();
+                    
+                }
+
+                
+
+            }
         
         }
 

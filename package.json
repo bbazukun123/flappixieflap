@@ -11,7 +11,8 @@
   "license": "MIT",
   "dependencies": {
     "pixi.js": "^5.0.4",
-    "pixijs-charm": "^0.1.4"
+    "pixijs-charm": "^0.1.4",
+    "sound.js": "^1.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.5.0",

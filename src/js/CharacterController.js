@@ -14,6 +14,7 @@ export default class CharacterController{
         this.jumpVelocity = 10;
         this.velocity = 0;
         this.gravity = 0.5;
+        this.jumpSoundEnabled = false;
 
         //Setup character once resources loading completes
         this.dataController.loader.load(this.setupCharacter.bind(this));
@@ -159,6 +160,9 @@ export default class CharacterController{
 
     jump(){
 
+        if(this.jumpSoundEnabled && !this.gameController.soundMuted)
+            this.gameController.soundController.jumpSound();
+
         if(this.characterSprite.y > -(this.app.renderer.screen.height / 3))
             this.velocity = -(this.jumpVelocity * this.gameController.scaleFactor);
 
@@ -178,11 +182,19 @@ export default class CharacterController{
         this.characterSprite.y = newY;
     }
 
+    set posX(newX){
+        this.characterSprite.x = newX;
+    }
     //Stop the listeners and scorer, and plunge the character off the screen
     dead(){
+        this.jumpSoundEnabled = false;
         this.gameController.scoringActive = false;
+        if(!this.gameController.soundMuted)
+            this.gameController.soundController.deadSound();
         this.deactivateControls();
-        this.velocity = 10;
+        /* this.velocity = 2; */
+        this.jump();
+        console.log("Dead Jump");
     }
 
     //Checks whether the character falls completely off the screen or not
@@ -207,14 +219,25 @@ export default class CharacterController{
             this.posY += (this.velocity * delta) * this.gameController.scaleFactor;
 
         //Some rotation touches
-        if(this.characterSprite.rotation < 0)
-            this.characterSprite.rotation = 0;
+        if(this.gameController.scoringActive){
 
-        this.characterSprite.rotation += (this.velocity/300) * delta;
+            if(this.characterSprite.rotation < 0)
+                this.characterSprite.rotation = 0;
 
-        if(this.characterSprite.rotation > Math.PI / 20)
-            this.characterSprite.rotation = Math.PI / 20;
+            this.characterSprite.rotation += (this.velocity/300) * delta;
 
+            if(this.characterSprite.rotation > Math.PI / 20)
+                this.characterSprite.rotation = Math.PI / 20;
+
+            return;
+
+        }     
+
+        //After character collides
+        if(!this.gameController.scoringActive){
+            this.characterSprite.rotation += Math.PI / 20;
+            /* this.posX += ((this.velocity * delta) * this.gameController.scaleFactor) / 5; */
+        }
         
     }
 

@@ -4,6 +4,7 @@ import MapController from "./MapController"
 import UIController from "./UIController"
 import DataController from "./DataController"
 import TransitionController from "./TransitionController"
+import SoundController from "./SoundController"
 
 /* For global game control that acts as a key reference */
 export default class GameController{
@@ -33,6 +34,7 @@ export default class GameController{
         this.uiController = new UIController(this);
         this.characterController = new CharacterController(this);
         this.mapController = new MapController(this);
+        this.soundController = new SoundController();
 
         //Utility variables and references
         this.sceneContainers = {};
@@ -41,6 +43,7 @@ export default class GameController{
         this.scoringActive = true;
         this.score = 0;
         this.accumulatedDelta = 0;
+        this.soundMuted
 
         this.init();
 
@@ -145,6 +148,8 @@ export default class GameController{
 
                 this.mapController.scoringIndex++;
                 this.score++;
+                if(!this.soundMuted)
+                    this.soundController.scoringSound();
                 this.uiController.gameScore.text = this.score;
 
             }
@@ -220,6 +225,8 @@ export default class GameController{
 
     loadingScene(delta){
 
+        this.uiController.menuLoop(delta);
+
         this.dataController.loader
             .on("progress",(loader) => {
                 console.log(loader.progress + "%");
@@ -237,21 +244,26 @@ export default class GameController{
     gameScene(delta){
         
         this.characterController.characterPhysics(delta);
+        this.mapController.mapLoop(delta);
 
         //Checks for current status of the gameplay and loops accordingly
-        if(!this.characterController.isDead() && !this.isCollided()){
-            this.mapController.mapLoop(delta);
+        if(!this.characterController.isDead() && !this.isCollided()){ 
+
             this.scoring();
 
-            //Hacky Solution! ** NTF: Fix this ASAP!
+            //Hacky Solutions! ** NTF: Fix this ASAP!
             if(this.uiController.go.alpha > 0){
                 this.uiController.go.alpha -= (delta/40);
+            }
+
+            if(this.uiController.gameScore.alpha < 1){
                 this.uiController.gameScore.alpha += (delta/40);
             }
                 
         }else if(!this.sceneContainers["End"].visible){
 
-            this.characterController.dead();
+            if(this.scoringActive)
+                this.characterController.dead();
 
             if(this.score > this.dataController.highscore)
                 this.dataController.highscore = this.score;

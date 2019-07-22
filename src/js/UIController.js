@@ -10,7 +10,9 @@ export default class UIController{
         this.dataController = gameController.dataController;  
         this.app = gameController.app;
 
+        //Utility variables
         this.fontStyles = [];
+        this.isLoading = true;
 
         //Setup UI once resources loading completes
         this.dataController.loader.load(this.setupUI.bind(this));
@@ -22,7 +24,7 @@ export default class UIController{
         //Generate different font styles (mainly just size differences) - ** NTS: Please find more effective way in dealing with dynamic texts **
         this.createFontStyles();
 
-        /* Potential Loading UI if loading time becomes significant */
+        this.createLoadingScreen();
         this.createMainMenu();
         this.createInGameUI();
         this.createEndMenu();
@@ -64,6 +66,26 @@ export default class UIController{
         this.fontStyles.push(baseStyle(30,8));
         this.fontStyles.push(baseStyle(70,8));
         this.fontStyles.push(baseStyle(400,20));
+
+    }
+
+    createLoadingScreen(){
+
+        //Loader graphic
+        this.loaderGraphic = new PIXI.Sprite(this.dataController.loader.resources["ui_loader"].texture);
+        this.loaderGraphic.anchor.set(0.5);
+        this.gameController.adjustSprite(this.loaderGraphic);
+        this.loaderGraphic.x = this.app.renderer.screen.width / 2;
+        this.loaderGraphic.y = this.app.renderer.screen.height / 2.5;
+        this.gameController.sceneContainers["Loading"].addChild(this.loaderGraphic);
+
+        const loaderText = new PIXI.Text('Loading', this.fontStyles[0]);
+        loaderText.anchor.x = 0.5;
+        this.gameController.adjustSprite(loaderText);
+        loaderText.x = this.app.renderer.screen.width / 2;
+        loaderText.y = this.app.renderer.screen.height / 1.8;
+        this.gameController.sceneContainers["Loading"].addChild(loaderText);
+
 
     }
 
@@ -115,6 +137,8 @@ export default class UIController{
         rightArrow.buttonMode = true;
         rightArrow.on("pointerdown",() => {
             this.changeSkin("next");
+            if(!this.gameController.soundMuted)
+                this.gameController.soundController.buttonSound();
         })
         this.gameController.sceneContainers["MainMenu"].addChild(rightArrow);
 
@@ -127,6 +151,8 @@ export default class UIController{
         leftArrow.buttonMode = true;
         leftArrow.on("pointerdown",() => {
             this.changeSkin("previous");
+            if(!this.gameController.soundMuted)
+                this.gameController.soundController.buttonSound();
         })
         this.gameController.sceneContainers["MainMenu"].addChild(leftArrow);
 
@@ -139,10 +165,27 @@ export default class UIController{
         startButton.interactive = true;
         startButton.buttonMode = true;
         startButton.on("pointerdown",() => {
+            if(!this.gameController.soundMuted)
+                this.gameController.soundController.buttonSound();
             this.gameController.resetGame();
             this.gameController.changeState("Game");
         })
         this.gameController.sceneContainers["MainMenu"].addChild(startButton);
+
+        //Sound Toggle button
+        const soundSprite = this.gameController.soundMuted ? "ui_muted" : "ui_sound";
+        const soundButton = new PIXI.Sprite(this.dataController.loader.resources[soundSprite].texture);
+        soundButton.anchor.x = 1;
+        this.gameController.adjustSprite(soundButton);
+        soundButton.position.set(this.app.renderer.screen.width - (15 * this.gameController.scaleFactor),15 * this.gameController.scaleFactor);
+        soundButton.interactive = true;
+        soundButton.buttonMode = true;
+        soundButton.on("pointerdown",() => {
+            this.gameController.soundMuted = !this.gameController.soundMuted
+            const soundSprite = this.gameController.soundMuted ? "ui_muted" : "ui_sound";
+            soundButton.texture = this.dataController.loader.resources[soundSprite].texture;
+        })
+        this.gameController.sceneContainers["MainMenu"].addChild(soundButton);
 
     }
 
@@ -196,6 +239,23 @@ export default class UIController{
         this.one.zIndex = 2;
         this.go.zIndex = 2;
 
+        //Sound Toggle button
+        const soundSprite = this.gameController.soundMuted ? "ui_muted" : "ui_sound";
+        const soundButton = new PIXI.Sprite(this.dataController.loader.resources[soundSprite].texture);
+        soundButton.anchor.x = 1;
+        this.gameController.adjustSprite(soundButton);
+        soundButton.position.set(this.app.renderer.screen.width - (15 * this.gameController.scaleFactor),15 * this.gameController.scaleFactor);
+        soundButton.interactive = true;
+        soundButton.buttonMode = true;
+        soundButton.on("pointerdown",() => {
+            this.gameController.soundMuted = !this.gameController.soundMuted
+            const soundSprite = this.gameController.soundMuted ? "ui_muted" : "ui_sound";
+            soundButton.texture = this.dataController.loader.resources[soundSprite].texture;
+        })
+        this.gameController.sceneContainers["Game"].addChild(soundButton);
+
+        soundButton.zIndex = 1;
+
     }
 
     createEndMenu(){
@@ -242,7 +302,8 @@ export default class UIController{
         retryButton.interactive = true;
         retryButton.buttonMode = true;
         retryButton.on("pointerdown",() => {
-            /* this.gameController.resetGame(); */
+            if(!this.gameController.soundMuted)
+                this.gameController.soundController.buttonSound();
             this.gameController.changeState("Game");
         })
         this.gameController.sceneContainers["End"].addChild(retryButton);
@@ -256,6 +317,8 @@ export default class UIController{
         backButton.interactive = true;
         backButton.buttonMode = true;
         backButton.on("pointerdown",() => {
+            if(!this.gameController.soundMuted)
+                this.gameController.soundController.buttonSound();
             this.resetMainMenu();
             this.gameController.changeState("MainMenu");
         })
@@ -302,6 +365,15 @@ export default class UIController{
     
     //Animation Loop
     menuLoop(delta){
+
+        //For Loading Screen
+        if(this.isLoading){
+            if(this.loaderGraphic)
+                this.loaderGraphic.rotation += Math.PI / 100;
+            return;
+        }
+
+        //For Main Menu
         this.skinSprite.y = (this.app.renderer.screen.height / 2) + (Math.sin((this.gameController.accumulatedDelta / 20)) * 6);
         this.skinSprite.rotation = (Math.PI / 60) * (Math.sin((this.gameController.accumulatedDelta / 20) + 1));
     }

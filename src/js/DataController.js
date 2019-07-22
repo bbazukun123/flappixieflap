@@ -14,6 +14,9 @@ export default class DataController{
                 button2: "backButton.png",
                 button3: "replayButton.png",
                 arrow: "rightArrow.png",
+                loader: "loader.png",
+                sound: "soundOn.png",
+                muted: "muted.png"
             },
             // Currently, all the skins are initially unlocked, but a skin unlock system would be a nice compliment to the map progression in the future
             skins: [
@@ -210,7 +213,10 @@ export default class DataController{
             .add("ui_button", `${directory}/${this.gameContent.ui.button}`)
             .add("ui_button2", `${directory}/${this.gameContent.ui.button2}`)
             .add("ui_button3", `${directory}/${this.gameContent.ui.button3}`)
-            .add("ui_arrow", `${directory}/${this.gameContent.ui.arrow}`);
+            .add("ui_arrow", `${directory}/${this.gameContent.ui.arrow}`)
+            .add("ui_loader", `${directory}/${this.gameContent.ui.loader}`)
+            .add("ui_sound", `${directory}/${this.gameContent.ui.sound}`)
+            .add("ui_muted", `${directory}/${this.gameContent.ui.muted}`);
 
         //Load Sounds *****
 
