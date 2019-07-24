@@ -213,6 +213,9 @@ export default class CharacterController{
         //Downwards acceleration
         if(this.velocity < 50)
             this.velocity += (this.gravity * delta) * this.gameController.scaleFactor;
+        
+        if(this.velocity < 0)
+            console.log(this.velocity);
 
         //Move character according to any resulted velocity
         if(this.characterSprite.y < this.app.renderer.screen.height + this.characterSprite.height)

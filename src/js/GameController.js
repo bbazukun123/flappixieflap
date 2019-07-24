@@ -166,9 +166,9 @@ export default class GameController{
 
         //** NTS: Still need to balance the hitbox boundary **
         const minXOffset = 0 * this.scaleFactor;
-        const minYOffset = 15 * this.scaleFactor;
-        const maxXOffset = 20 * this.scaleFactor;
-        const maxYOffset = 10 * this.scaleFactor;
+        const minYOffset = 25 * this.scaleFactor;
+        const maxXOffset = 45 * this.scaleFactor;
+        const maxYOffset = 20 * this.scaleFactor;
 
         const minCharacterY = (character.y - character.height / 2) + minYOffset;
         const maxCharacterY = (character.y + character.height / 2) - maxYOffset;

@@ -11,7 +11,8 @@ This repo contains codes and assets for the **test game for Goodboy Digital**. [
 
 ## Update Log
 
-- **1.0.4**: Added basic sound effects and sound toggle.
+- **1.1.1**: Balanced the hitbox boundary further.
+- **1.1.0**: Added basic sound effects and sound toggle.
 - **1.0.3**: Fixed scroll speed proportions and added map scroll dampening and a more natural character plunging on death.
 - **1.0.2**: Added a loading animation and fixed Black line tiling sprite issue.
 - **1.0.1**: Added a 3-2-1 countdown timer and balanced the hitbox boundary.
