@@ -19,4 +19,4 @@ This repo contains codes and assets for the **test game for Goodboy Digital**. [
 
 ## WIP
 
-- **Fullscreen Experience**: Currently working on the seamless resizing of graphics for desktop browsers and searching for ways to balance the gameplay throughout various resizing ratios.
+- **Fullscreen Experience**: Currently working on the seamless resizing of graphics for desktop browsers and searching for ways to balance the gameplay throughout various resizing ratios. (Priority Order: scaleFactor & resizing listener > UI Placements > Character Placement > Obstacle placements > Background Elements)
